@@ -2,16 +2,18 @@ import { useEffect, useState } from 'react';
 import './App.css'
 import BannerMovies from "./Sections/BannerMovies.tsx";
 import ITvShow from './Models/ITvShow.tsx';
+import { GetTvShows } from './Services/ApiService.tsx';
 
 function App() {
   const [tvShows,setTvShows] = useState<ITvShow[]>();
 
-  useEffect(()=>{
-    fetch("https://www.episodate.com/api/most-popular?page=1").then(async (response) => {
-      const data = await response.json();
-      
-      setTvShows(data.tv_shows);
-    });
+  useEffect(function(){
+    const getData = async function(){
+      const data = await GetTvShows(2);
+      setTvShows(data);
+    }
+
+    getData();
   },[]);
 
   return (
