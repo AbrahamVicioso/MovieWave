@@ -1,14 +1,16 @@
 import ITvShow from "../Models/ITvShow";
 import { useEffect, useState } from "react";
-import {FaArrowLeft,FaArrowRight} from "react-icons/fa"; 
+import {FaArrowLeft,FaArrowRight, FaPlay} from "react-icons/fa"; 
+import { useNavigate } from "react-router";
 
 interface BannerMovieProps{
     tvShows: ITvShow[] | undefined
 }
 
 export default function BannerMovies({tvShows}: BannerMovieProps){
-    const [idSelectedTvShow,setidSelectedTvShow] = useState<number>();
     const [selectedTvShow,setSelectedTvShow] = useState<ITvShow | undefined>(tvShows![0]);
+    const [idSelectedTvShow,setidSelectedTvShow] = useState<number>(selectedTvShow?.id || 0);
+    const navigate = useNavigate();
 
     useEffect(()=>{
         fetch(`https://www.episodate.com/api/show-details?q=${idSelectedTvShow || selectedTvShow?.id}`).then(async (response)=>{
@@ -18,7 +20,7 @@ export default function BannerMovies({tvShows}: BannerMovieProps){
     },[idSelectedTvShow])
 
     return <>
-        <div className="min-h-screen grid grid-rows-5 pt-10 px-10">
+        <div className="min-h-screen grid grid-rows-4 pt-10 px-10">
             <div className="grid grid-cols-2 transition-all col-start-1 row-span-2 row-start-1 p-5">
                 <div className="flex flex-col pt-10 top-0">
                     <h1 className="text-2xl font-semibold">{selectedTvShow?.name}</h1>
@@ -26,10 +28,15 @@ export default function BannerMovies({tvShows}: BannerMovieProps){
                         {selectedTvShow?.description}
                     </div>
                     <div className="mt-5">
-                        <button className="bg-amber-600 px-10 py-2 rounded-full text-white  text-lg">Play</button>
+                        <button
+                        onClick={e => {
+                            e.preventDefault();
+                            navigate(`tvshow/${idSelectedTvShow}`);
+                        }}
+                        className="bg-amber-600 px-10 py-2 rounded-full text-white flex justify-center items-center gap-3 text-lg cursor-pointer"><FaPlay/>Play</button>
                     </div>
                 </div>
-                <div className="grid grid-cols-3 max-h-90 overflow-hidden p-10">
+                <div className="grid grid-cols-3 max-h-69 overflow-y-hidden p-10">
                     {
                         selectedTvShow?.pictures && selectedTvShow?.pictures.map(x => <>
                             <img className="h-full object-cover w-full hover:scale-105 transition-all" key={x} src={x} alt={selectedTvShow?.name} />
@@ -49,7 +56,7 @@ export default function BannerMovies({tvShows}: BannerMovieProps){
                 </div>
                 <div id="carousel" className="flex overflow-x-hidden h-fit gap-10 py-10 relative px-10">
                     {tvShows?.map(x => <>
-                        <div onClick={e => setidSelectedTvShow(x.id)} className="max-h-73 min-h-64 w-52 aspect-9/16 flex flex-col">
+                        <div onClick={e => setidSelectedTvShow(x.id)} className="max-h-73 min-h-64 w-52 aspect-9/16 flex flex-col cursor-pointer">
                             <img className={`object-fit rounded-sm h-full transition-all border relative border-gray-300 ${idSelectedTvShow == x.id && "scale-105 top-[-10px]"}`} src={x.image_thumbnail_path} alt="" />
                             <p className="text-nowrap overflow-hidden whitespace-nowrap max-w-full text-ellipsis m-1 font-bold">{x.name}</p>
                         </div>
